@@ -85,6 +85,18 @@ def main():
                 print("Введите текст заметки ", end='')
                 notes.addNote(input())
                 notes.listNotes()
+            case 2:
+                notes.listNotes()
+                print("Введите номер заметки для удаления ", end='')
+                chid = int(input().strip())
+                for i in range(1,len(Notes.notesList)):
+                    # print (type(ex['noteid']),chid, ex['noteid']==chid)
+                    if int(Notes.notesList[i]['noteid'])==chid:
+                        del Notes.notesList[i]
+                        print("Удалено успешно")
+                        notes.listNotes()
+                        break
+
             case 4:
                 files.fromCsv('notes_file.csv')
             case 5:
