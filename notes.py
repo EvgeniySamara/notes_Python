@@ -16,6 +16,8 @@ class Notes:
         dt_string = dt_now.strftime('%d/%m/%y %H:%M:%S')
         if tag is None:
             tag = []
+        else:
+            tag = list(map(lambda x: x.strip(), tag.split(',')))
         d = dict(noteid=noteid, txt=txt, tag=tag, Notedt=dt_string)
 
         Notes.notesList.append(d)
@@ -83,19 +85,46 @@ def main():
 
             case 1:
                 print("Введите текст заметки ", end='')
-                notes.addNote(input())
+                txt = input().strip()
+                print("Введите теги через запятую (необязательный параметр): ", end='')
+                tag = input()
+                notes.addNote(txt,tag)
+
                 notes.listNotes()
             case 2:
                 notes.listNotes()
                 print("Введите номер заметки для удаления ", end='')
                 chid = int(input().strip())
                 for i in range(1,len(Notes.notesList)):
-                    # print (type(ex['noteid']),chid, ex['noteid']==chid)
                     if int(Notes.notesList[i]['noteid'])==chid:
                         del Notes.notesList[i]
                         print("Удалено успешно")
                         notes.listNotes()
                         break
+            case 3:
+                notes.listNotes()
+                print("Введите номер заметки для редактирования ", end='')
+                chid = int(input().strip())
+                for i in range(1,len(Notes.notesList)):
+                    if int(Notes.notesList[i]['noteid'])==chid:
+                         break
+                print("Введите, что будем редактировать: текст заметки(1), теги(2) ", end='')
+                chid = int(input().strip())
+                match chid:
+                    case 1:
+                        print("Введите текст заметки: ", end='')
+                        Notes.notesList[i]['txt']=input().strip()
+                        print("Текст заметки изменен")
+                    case 2:
+                        print("Введите теги через запятую: ", end='')
+
+                        Notes.notesList[i]['tag'] = list(Notes.notesList[i]['tag'])
+                        # print(Notes.notesList[i]['tag'], type(Notes.notesList[i]['tag']))
+                        # Notes.notesList[i]['tag'].clear();
+                        Notes.notesList[i]['tag']=list(map(lambda x: x.strip(),  input().split(',')))
+                        print("Тэги изменены")
+                    case _:
+                        print("Неверная команда")
 
             case 4:
                 files.fromCsv('notes_file.csv')
