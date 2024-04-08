@@ -12,13 +12,11 @@ class Notes:
     @staticmethod
     def addNote(txt, tag=None):
         noteid = len(Notes.notesList)
-        dt_now = datetime.datetime.now()
-        dt_string = dt_now.strftime('%d/%m/%y %H:%M:%S')
         if tag is None:
             tag = []
         else:
             tag = list(map(lambda x: x.strip(), tag.split(',')))
-        d = dict(noteid=noteid, txt=txt, tag=tag, Notedt=dt_string)
+        d = dict(noteid=noteid, txt=txt, tag=tag, Notedt=Notes.getDT())
 
         Notes.notesList.append(d)
 
@@ -26,6 +24,57 @@ class Notes:
     def listNotes():
         for c in Notes.notesList:
             print(*c.values(), sep='   ')
+
+    @staticmethod
+    def getDT():
+        dt_now = datetime.datetime.now()
+        dt_string = dt_now.strftime('%d/%m/%y %H:%M:%S')
+        return dt_string
+
+    @staticmethod
+    def editNotes(noteid):
+        for i in range(1, len(Notes.notesList)):
+            if int(Notes.notesList[i]['noteid']) == noteid:
+                break
+        print("Введите, что будем редактировать: текст заметки(1), теги(2) ", end='')
+        chid = int(input().strip())
+        match chid:
+            case 1:
+                print("Введите текст заметки: ", end='')
+                Notes.notesList[i]['txt'] = input().strip()
+                Notes.notesList[i]['Notedt'] = Notes.getDT()
+
+                print("Текст заметки изменен")
+            case 2:
+                print("Введите теги через запятую: ", end='')
+
+                Notes.notesList[i]['tag'] = list(Notes.notesList[i]['tag'])
+                Notes.notesList[i]['tag'] = list(map(lambda x: x.strip(), input().split(',')))
+                Notes.notesList[i]['Notedt'] = Notes.getDT()
+
+                print("Тэги изменены")
+            case _:
+                print("Неверная команда")
+
+    @staticmethod
+    def delNotes(noteid):
+        for i in range(1, len(Notes.notesList)):
+            if int(Notes.notesList[i]['noteid']) == noteid:
+                del Notes.notesList[i]
+                print("Удалено успешно")
+                break
+
+    @staticmethod
+    def getNotesbyDate(notesdate):
+        for i in range(1, len(Notes.notesList)):
+            if Notes.notesList[i]['Notedt'][:8] == notesdate:
+                print(*Notes.notesList[i].values())
+
+    @staticmethod
+    def getNotesbyId(notesid):
+        if len(notesid) > 0:
+            for i in notesid:
+                print(*Notes.notesList[int(i)].values())
 
 
 class FileInOut:
@@ -52,7 +101,7 @@ class FileInOut:
 
                     Notes.notesList.clear()
                     Notes.notesList = list(reader)
-                    #Notes.notesList.append(dict(reader))
+
                     print('Данные успешно загружены')
 
             except Exception as e:
@@ -73,6 +122,8 @@ def main():
         print('4 -  Загрузить из файла')
         print('5 -  Сохранить в файл')
         print('6 -  Просмотреть записи')
+        print('7 -  Вывести записи за дату')
+        print('8 -  Вывести записи по id')
         print('0 -  Выйти из программы')
         print('Введите номер пункта меню ', end='')
         menuItem = int(input().strip())
@@ -88,43 +139,21 @@ def main():
                 txt = input().strip()
                 print("Введите теги через запятую (необязательный параметр): ", end='')
                 tag = input()
-                notes.addNote(txt,tag)
+                notes.addNote(txt, tag)
 
                 notes.listNotes()
             case 2:
                 notes.listNotes()
                 print("Введите номер заметки для удаления ", end='')
                 chid = int(input().strip())
-                for i in range(1,len(Notes.notesList)):
-                    if int(Notes.notesList[i]['noteid'])==chid:
-                        del Notes.notesList[i]
-                        print("Удалено успешно")
-                        notes.listNotes()
-                        break
+                Notes.delNotes(chid)
+                notes.listNotes()
+
             case 3:
                 notes.listNotes()
                 print("Введите номер заметки для редактирования ", end='')
                 chid = int(input().strip())
-                for i in range(1,len(Notes.notesList)):
-                    if int(Notes.notesList[i]['noteid'])==chid:
-                         break
-                print("Введите, что будем редактировать: текст заметки(1), теги(2) ", end='')
-                chid = int(input().strip())
-                match chid:
-                    case 1:
-                        print("Введите текст заметки: ", end='')
-                        Notes.notesList[i]['txt']=input().strip()
-                        print("Текст заметки изменен")
-                    case 2:
-                        print("Введите теги через запятую: ", end='')
-
-                        Notes.notesList[i]['tag'] = list(Notes.notesList[i]['tag'])
-                        # print(Notes.notesList[i]['tag'], type(Notes.notesList[i]['tag']))
-                        # Notes.notesList[i]['tag'].clear();
-                        Notes.notesList[i]['tag']=list(map(lambda x: x.strip(),  input().split(',')))
-                        print("Тэги изменены")
-                    case _:
-                        print("Неверная команда")
+                Notes.editNotes(chid)
 
             case 4:
                 files.fromCsv('notes_file.csv')
@@ -132,6 +161,12 @@ def main():
                 files.toCsv(Notes.notesList)
             case 6:
                 notes.listNotes()
+            case 7:
+                print("Введите дату в формате дд/мм/гг")
+                notes.getNotesbyDate(input().strip())
+            case 8:
+                print("Введите id заявок через запятую")
+                notes.getNotesbyId(input().split(','))
             case _:
                 print("Неверная команда")
 
