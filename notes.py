@@ -81,6 +81,8 @@ class FileInOut:
 
     @staticmethod
     def toCsv(outdict, filename='notes_file.csv'):
+        if filename == '':
+            filename = 'notes_file.csv'
         try:
             with open(filename, 'w', newline='', encoding='utf-8') as csv_file:
 
@@ -93,10 +95,12 @@ class FileInOut:
             print('При сохранении возникла ошибка ' + str(e))
 
     @staticmethod
-    def fromCsv(file_name='note_book.csv'):
-        if os.path.exists(file_name):
+    def fromCsv(filename='notes_file.csv'):
+        if filename == '':
+            filename = 'notes_file.csv'
+        if os.path.exists(filename):
             try:
-                with open(file_name, encoding='utf-8') as csvfile:
+                with open(filename, encoding='utf-8') as csvfile:
                     reader = csv.DictReader(csvfile)
 
                     Notes.notesList.clear()
@@ -107,7 +111,7 @@ class FileInOut:
             except Exception as e:
                 print('При загрузке данных возникла ошибка ' + str(e))
         else:
-            print(f"Файл {file_name} не найден")
+            print(f"Файл {filename} не найден")
 
 
 def main():
@@ -156,9 +160,11 @@ def main():
                 Notes.editNotes(chid)
 
             case 4:
-                files.fromCsv('notes_file.csv')
+                print("Введите имя файла (ввод для имени по умолчанию 'notes_file.csv'): ", end='')
+                files.fromCsv(input().strip())
             case 5:
-                files.toCsv(Notes.notesList)
+                print("Введите имя файла (ввод для имени по умолчанию 'notes_file.csv'): ", end='')
+                files.toCsv(Notes.notesList, input().strip())
             case 6:
                 notes.listNotes()
             case 7:
